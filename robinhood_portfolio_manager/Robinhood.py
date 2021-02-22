@@ -63,14 +63,14 @@ class Robinhood(object):
         else:
             csv_file = pathlib.Path.home().joinpath("Robinhood.csv")
 
-        if not xlsx_file.is_file() and not csv_file.is_file():
-            message = "Excel file not found. Run generate_excel_file()."
+        if xlsx_file.is_file():
+            self._check_excel_list(xlsx_file)
+        elif csv_file.is_file():
+            self._check_csv_list(csv_file)
+        else:
+            message = "Excel/CSV file not found. Run generate_excel_file()."
             self.logger.error(message)
             raise Exception(message)
-        elif xlsx_file.is_file():
-            self._check_excel_list(xlsx_file)
-        else:
-            self._check_csv_list(csv_file)
 
 
     def _check_excel_list(self, xlsx_file):
@@ -232,12 +232,35 @@ class Robinhood(object):
 
 
     def get_new_investments(self):
-        xlsx_file = pathlib.Path(__file__).parent.absolute().joinpath("Robinhood.xlsx")
-        wb_obj = openpyxl.load_workbook(xlsx_file)
-        sheet = wb_obj.active
-        max_row = len(sheet["A"]) - 1
-        investments = {row[0].value: round(float(row[1].value), 2) for row in sheet.iter_rows(min_row=2, max_row=max_row)}
-        return investments
+        if platform.system().lower() == "windows":
+            xlsx_file = pathlib.Path.home().joinpath("Documents", "Robinhood.xlsx")
+        else:
+            xlsx_file = pathlib.Path.home().joinpath("Robinhood.xlsx")
+
+        if platform.system().lower() == "windows":
+            csv_file = pathlib.Path.home().joinpath("Documents", "Robinhood.csv")
+        else:
+            csv_file = pathlib.Path.home().joinpath("Robinhood.csv")
+
+        if xlsx_file.is_file():
+            wb_obj = openpyxl.load_workbook(xlsx_file)
+            sheet = wb_obj.active
+            max_row = len(sheet["A"]) - 1
+            investments = {row[0].value: round(float(row[1].value), 2) for row in sheet.iter_rows(min_row=2, max_row=max_row)}
+            return investments
+        elif csv_file.is_file():
+            _list = []
+            with open(csv_file, 'r') as file:
+                data = csv.reader(file)
+                for row in data:
+                    if row:
+                        _list.append(row)
+            investments = {row[0]: float(row[1]) for row in _list}
+            return investments
+        else:
+            message = "Excel/CSV file not found. Run generate_excel_file()."
+            self.logger.error(message)
+            raise Exception(message)
 
 
     def cancel_open_orders(self, side="all", sim=False):
@@ -343,5 +366,4 @@ class Robinhood(object):
         self.logger.info(f"Total Invested ${total:.2f}")
 
     def test(self):
-        self._check_list()
         print("Test Function Executed")

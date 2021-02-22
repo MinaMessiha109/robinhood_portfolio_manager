@@ -255,7 +255,7 @@ class Robinhood(object):
                 for row in data:
                     if row:
                         _list.append(row)
-            investments = {row[0]: float(row[1]) for row in _list}
+            investments = {row[0]: float(row[1]) for row in _list[1:0] if row}
             return investments
         else:
             message = "Excel/CSV file not found. Run generate_excel_file()."

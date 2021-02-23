@@ -4,7 +4,7 @@
 # Author: Mina Messiha
 # Copyright: Copyright 2021, robinhood-portfolio-manager
 # License: MIT License
-# Version: 0.0a9
+# Version: 0.0b1
 # Date: 02-22-2021
 # Email: mena.sb.109@gmail.com
 # URLs: pypi.org/project/robinhood-portfolio-manager &
@@ -221,6 +221,8 @@ class Robinhood(object):
             writer = csv.writer(file)
             writer.writerow(["Symbol", "Percentage"])
             writer.writerows(rows)
+        
+        self.logger.info("CSV file generated. Configure percentages for each stock.")
 
 
     def get_current_investments(self):
@@ -303,8 +305,10 @@ class Robinhood(object):
                 if not sim:
                     order = rh.orders.order_sell_fractional_by_quantity(instrument, available_shares, "gfd", True)
                 self.logger.info(f"Selling {available_shares} share(s) of {instrument}.")
+            
             if collateral_shares:
                 self.logger.info(f"{collateral_shares} share(s) of {instrument} held as collateral")
+            
             time.sleep(5)
 
 
@@ -380,6 +384,7 @@ class Robinhood(object):
             total += amount
 
         self.logger.info(f"Total Invested ${total:.2f}")
+
 
     def test(self):
         print("Test Function Executed")

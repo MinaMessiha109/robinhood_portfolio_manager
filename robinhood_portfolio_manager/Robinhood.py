@@ -4,8 +4,8 @@
 # Author: Mina Messiha
 # Copyright: Copyright 2021, robinhood-portfolio-manager
 # License: MIT License
-# Version: 0.0b2
-# Date: 02-22-2021
+# Version: 0.0b3
+# Date: 02-25-2021
 # Email: mena.sb.109@gmail.com
 # URLs: pypi.org/project/robinhood-portfolio-manager &
 # github.com/MinaMessiha109/robinhood_portfolio_manager
@@ -348,7 +348,7 @@ class Robinhood(object):
                 time.sleep(30)
 
         for instrument, percent in new_investments.items():
-            margin_ratio = float(rh.stocks.find_instrument_data(instrument, False)[0]["margin_initial_ratio"])
+            margin_ratio = float(rh.stocks.find_instrument_data(instrument)[0]["margin_initial_ratio"])
             amount = ((buying_power + portfolio_value) * percent) / margin_ratio
 
             if instrument in current_investments:
